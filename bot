@@ -8,27 +8,11 @@ import telebot
 from telebot import types
 import datetime
 date = datetime.datetime.now()
-can_process = False
+#can_process = False
 
 bot = telebot.TeleBot(config.token)
-    #bot.reply_to(message,"Сначала день, затем месяц")
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    bot.send_message(message.chat.id, "Введите дату: ")
-    #bot.reply_to(message, "Введите дату: ")
-    global can_process
-    can_process = True
-@bot.message_handler(commands=['help'])
-def help(message):
-    bot.send_message(message.chat.id, "Введите сначало день, затем месяц(пример: '05.04')")
-@bot.message_handler(func=lambda message: True)
-def echo_all(message):
-    global can_process
-    if not can_process: return
-    f = message.text
-    id = message.chat.id
 
-    present = {"01.01": "Новый год",
+present = {"01.01": "Новый год",
                "07.01": "Рождество Христово",
                "11.01": "День заповедников и национальных парков России",
                "12.01": "День работника прокуратуры Российской Федерации",
@@ -210,7 +194,31 @@ def echo_all(message):
                "19.12": "День военной контрразведки в России",
                "22.12": "День энергетика в России",
                "23.12": "День дальней авиации ВВС России",
+               "24.12": "День зачета по этому боту",
                "27.12": "День спасателя в России",}
+    #bot.reply_to(message,"Сначала день, затем месяц")
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.send_message(message.chat.id, "Введите дату: ")
+    #bot.reply_to(message, "Введите дату: ")
+    #global can_process
+    #can_process = True
+
+@bot.message_handler(commands=['today'])
+def today(message):
+    global present
+    data = datetime.datetime.fromtimestamp(message.date).strftime("%d.%m")
+    bot.send_message(message.chat.id, present[data])
+@bot.message_handler(commands=['help'])
+def help(message):
+    bot.send_message(message.chat.id, "Введите сначала день, затем месяц(пример:'05.04')")
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    global present
+    #global can_process
+    #if not can_process: return
+    f = message.text
+    id = message.chat.id
     try:
         bot.send_message(id, present[f])
     except KeyError:
